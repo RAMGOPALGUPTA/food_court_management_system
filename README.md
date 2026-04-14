@@ -89,8 +89,7 @@ npm install
 node server.js
 ```
 
-Server will run on:
-👉 http://localhost:5000
+
 
 ---
 
