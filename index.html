@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EATOO — Food Court</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+      <div class="nav-inner">
+        <div class="nav-brand">
+          <span class="brand-icon">🍽</span>
+          <div class="brand-text-wrap">
+            <span class="brand-name">EATOO</span>
+            <span class="brand-tagline">Food Court</span>
+          </div>
+        </div>
+        <div class="nav-links">
+          <button
+            class="nav-btn active"
+            data-section="menu"
+            onclick="showSection('menu', this)"
+          >
+            Menu
+          </button>
+          <button
+            class="nav-btn"
+            data-section="orders"
+            onclick="showSection('orders', this)"
+          >
+            My Order
+          </button>
+          <button
+            class="nav-btn"
+            data-section="top"
+            onclick="showSection('top', this)"
+          >
+            Top Rated
+          </button>
+        </div>
+        <div
+          class="nav-cart"
+          onclick="
+            showSection(
+              'orders',
+              document.querySelector('[data-section=orders]'),
+            )
+          "
+        >
+          <span class="cart-icon">🛒</span>
+          <span class="cart-count" id="cartCount">0</span>
+        </div>
+      </div>
+      <div id="userSection" class="user-section hidden">
+        <span id="userName"></span>
+        <button onclick="logout()" class="btn-logout">Logout</button>
+      </div>
+    </nav>
+
+    <!-- ===== HERO ===== -->
+    <header class="hero">
+      <div class="hero-content">
+        <p class="hero-label">Welcome to</p>
+        <h1 class="hero-title">EATOO <em>Food Court</em></h1>
+        <p class="hero-desc">
+          Fresh bites from all your favourite campus vendors — order in seconds.
+        </p>
+        <button
+          class="btn-primary hero-cta"
+          onclick="
+            showSection('menu', document.querySelector('[data-section=menu]'))
+          "
+        >
+          Browse Today's Menu →
+        </button>
+      </div>
+      <div class="hero-art">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="floating-emoji" style="--d: 0s; --x: 60%; --y: 20%">🍕</div>
+        <div class="floating-emoji" style="--d: 0.6s; --x: 80%; --y: 55%">
+          🍔
+        </div>
+        <div class="floating-emoji" style="--d: 1.1s; --x: 45%; --y: 65%">
+          🍜
+        </div>
+        <div class="floating-emoji" style="--d: 1.7s; --x: 72%; --y: 30%">
+          🧁
+        </div>
+        <div class="floating-emoji" style="--d: 2.2s; --x: 55%; --y: 45%">
+          🍣
+        </div>
+      </div>
+    </header>
+    <!-- AUTHENTICATION SECTION -->
+    <div id="authSection" class="auth-wrapper">
+      <div class="auth-card">
+        <h2>Welcome to EATOO</h2>
+        <p class="auth-sub">Login or create your account</p>
+
+        <input id="name" placeholder="Full Name (for register)" />
+        <input id="email" placeholder="Email" />
+        <input id="phone" placeholder="Phone (optional)" />
+        <input id="password" type="password" placeholder="Password" />
+
+        <div class="auth-buttons">
+          <button class="btn-primary" onclick="login()">Login</button>
+          <button class="btn-secondary" onclick="register()">Register</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MAIN ===== -->
+    <main>
+      <!-- MENU SECTION -->
+      <section id="section-menu" class="section active">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">Today's Menu</h2>
+            <p class="section-sub">Tap any dish to add it to your cart</p>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              id="searchInput"
+              class="search-input"
+              placeholder="🔍  Search dishes…"
+              oninput="filterMenu()"
+            />
+            <button class="btn-refresh" onclick="loadMenu()">↺ Refresh</button>
+          </div>
+          <div id="menuLoader" class="loader-wrap">
+            <div class="spinner"></div>
+            <p>Fetching today's items…</p>
+          </div>
+          <div id="menuError" class="error-wrap hidden">
+            <span class="error-icon">⚠️</span>
+            <p id="menuErrorMsg">
+              Could not reach the server. Is your backend running?
+            </p>
+            <button class="btn-primary small" onclick="loadMenu()">
+              Retry
+            </button>
+          </div>
+          <div id="menuGrid" class="food-grid hidden"></div>
+        </div>
+      </section>
+
+      <!-- ORDER / CART SECTION -->
+      <section id="section-orders" class="section hidden">
+        <div class="container narrow">
+          <div class="section-header">
+            <h2 class="section-title">Your Cart</h2>
+            <p class="section-sub">Review items and place your order</p>
+          </div>
+          <div id="emptyCart" class="empty-state">
+            <span class="empty-emoji">🛒</span>
+            <p>Your cart is empty.<br />Go add some tasty items!</p>
+            <button
+              class="btn-primary small"
+              onclick="
+                showSection(
+                  'menu',
+                  document.querySelector('[data-section=menu]'),
+                )
+              "
+            >
+              Browse Menu
+            </button>
+          </div>
+          <div id="cartItems" class="cart-list hidden"></div>
+          <div id="checkoutForm" class="checkout-card hidden">
+            <h3>Checkout</h3>
+            <label class="form-label" for="studentIdInput"
+              >Student ID <span class="required">*</span></label
+            >
+            <input
+              type="text"
+              id="studentIdInput"
+              class="form-input"
+              placeholder="e.g. 2024CS001"
+              maxlength="20"
+            />
+            <div class="order-summary" id="orderSummary"></div>
+            <button class="btn-order" id="orderBtn" onclick="placeOrder()">
+              <span id="orderBtnText">✓ Confirm Order</span>
+            </button>
+          </div>
+          <div id="orderSuccess" class="success-card hidden">
+            <div class="success-anim">✅</div>
+            <h3>Order Placed!</h3>
+            <p id="successMsg"></p>
+            <button class="btn-primary small" onclick="resetOrder()">
+              Place Another Order
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TOP RATED SECTION -->
+      <section id="section-top" class="section hidden">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">⭐ Top Rated</h2>
+            <p class="section-sub">The most-loved dishes on campus</p>
+          </div>
+          <div id="topLoader" class="loader-wrap">
+            <div class="spinner"></div>
+            <p>Loading fan favourites…</p>
+          </div>
+          <div id="topError" class="error-wrap hidden">
+            <span class="error-icon">⚠️</span>
+            <p id="topErrorMsg">Could not load top-rated items.</p>
+            <button class="btn-primary small" onclick="loadTopRated()">
+              Retry
+            </button>
+          </div>
+          <div id="topGrid" class="food-grid hidden"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <p>
+        EATOO Food Court Management System &nbsp;·&nbsp; DBMS Project
+        &nbsp;·&nbsp; <span id="year"></span>
+      </p>
+    </footer>
+
+    <!-- Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <div id="reviewModal" class="modal hidden">
+      <div class="modal-content">
+        <h3>Rate Food</h3>
+        <p id="foodName"></p>
+
+        <input type="text" id="reviewStudentId" placeholder="Student ID" />
+
+        <select id="ratingValue">
+          <option value="5">5 ⭐</option>
+          <option value="4">4 ⭐</option>
+          <option value="3">3 ⭐</option>
+          <option value="2">2 ⭐</option>
+          <option value="1">1 ⭐</option>
+        </select>
+
+        <textarea id="reviewComment" placeholder="Comment"></textarea>
+
+        <button onclick="submitReview()">Submit</button>
+        <button onclick="closeReviewModal()">Cancel</button>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
